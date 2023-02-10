@@ -80,7 +80,7 @@ function Body() {
       abi: abi,
       functionName: "numAddressesWhitelisted",
     });
-    return <p>{data} addresses whitelisted</p>;
+    return <p>{data!.toString()} addresses whitelisted</p>;
   };
 
   return (
