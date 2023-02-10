@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { abi } from "@/constants/abi";
 import Header from "./header";
 import Image from "next/image";
@@ -14,6 +14,7 @@ import {
 } from "wagmi";
 
 function Body() {
+  const [connected, setConnected] = useState(false);
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
@@ -25,16 +26,22 @@ function Body() {
     abi: abi,
     functionName: "addAddress",
   });
-  const { address, isConnected } = useAccount();
 
   const { data, write } = useContractWrite(config);
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
+
+  const { address, isConnected } = useAccount();
+
+  useEffect(() => {
+    setConnected(isConnected);
+  }, [connected]);
+
   const buttonClass =
     "translate-y-20 md:-translate-x-80 md:translate-y-36 bg-black text-white p-3 rounded-md";
   const renderButton = () => {
-    if (isConnected) {
+    if (connected) {
       return (
         <button
           className={buttonClass}
@@ -45,12 +52,13 @@ function Body() {
           Join Whitelist
         </button>
       );
+    } else if (!connected) {
+      return (
+        <button onClick={() => connect()} className={buttonClass}>
+          Connect Wallet
+        </button>
+      );
     }
-    return (
-      <button onClick={() => connect()} className={buttonClass}>
-        Connect Wallet
-      </button>
-    );
   };
   const renderSuccess = () => {
     if (isSuccess) {
@@ -61,12 +69,12 @@ function Body() {
     }
   };
   const renderPara = () => {
-    if (isConnected) {
+    if (connected) {
       return <p>Connected to {address}</p>;
     }
   };
 
-  const renderList = () => {
+  const RenderList = () => {
     const { data } = useContractRead({
       address: contractAddress,
       abi: abi,
@@ -88,7 +96,7 @@ function Body() {
           src="/crypto-devs.svg"
           className="w-full -translate-y-56 md:-translate-y-20 lg:-translate-y-10 lg:w-1/3 md:w-1/2 md:translate-x-32 lg:translate-x-60"
         />
-        {renderList()}
+        <RenderList />
         {renderSuccess()}
         {renderPara()}
       </main>
