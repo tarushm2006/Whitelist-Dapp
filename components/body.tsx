@@ -26,6 +26,7 @@ function Body() {
     address: contractAddress,
     abi: abi,
     functionName: "addAddress",
+    chainId: 5,
   });
 
   const { data, write } = useContractWrite(config);
@@ -33,11 +34,15 @@ function Body() {
     hash: data?.hash,
   });
 
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useAccount({
+    onConnect() {
+      setConnected(true);
+    },
+  });
 
   useEffect(() => {
     setConnected(isConnected);
-  }, [connected]);
+  }, [connected, isConnected]);
 
   const buttonClass =
     "translate-y-20 md:-translate-x-80 md:translate-y-36 bg-black text-white p-3 rounded-md";
@@ -47,7 +52,7 @@ function Body() {
         <button
           className={buttonClass}
           onClick={() => {
-            write!();
+            write?.();
           }}
         >
           Join Whitelist
@@ -84,6 +89,7 @@ function Body() {
     if (data !== undefined) {
       setNum(data!.toString());
     }
+
     return <p>{num} addresses whitelisted</p>;
   };
 
