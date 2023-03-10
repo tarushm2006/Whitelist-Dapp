@@ -15,6 +15,7 @@ import {
 
 function Body() {
   const [connected, setConnected] = useState(false);
+  const [num, setNum] = useState("0");
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
@@ -80,7 +81,10 @@ function Body() {
       abi: abi,
       functionName: "numAddressesWhitelisted",
     });
-    return <p>{data!.toString()} addresses whitelisted</p>;
+    if (data !== undefined) {
+      setNum(data!.toString());
+    }
+    return <p>{num} addresses whitelisted</p>;
   };
 
   return (
